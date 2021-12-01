@@ -10,6 +10,7 @@ import { keys } from "../bundlr";
 import { maticCreateTx, maticGetFee, maticGetHeight, maticGetPublicKey, maticGetSigner, maticGetTx, maticOwnerToAddress, maticSendTx, maticSign, maticVerify } from "./matic";
 import { Signer } from "arbundles/build/signing";
 import { solanaCreateTx, solanaGetCurrentHeight, solanaGetFee, solanaGetPublicKey, solanaGetSigner, solanaGetTx, solanaOwnerToAddress, solanaSendTx, solanaSign, solanaVerify } from "./solana";
+import { everpayCreateTx, everpayGetCurrentHeight, everpayGetFee, everpayGetPublicKey, everpayGetSigner, everpayGetTx, everpayOwnerToAddress, everpaySendTx, everpaySign, everpayVerify } from "./everpay";
 import { arweaveCreateTx, arweaveGetCurrentHeight, arweaveGetFee, arweaveGetId, arweaveGetPublicKey, arweaveGetSigner, arweaveGetTx, arweaveOwnerToAddress, arweaveSendTx, arweaveSign, arweaveVerify } from "./arweave";
 
 export interface Tx {
@@ -112,6 +113,25 @@ export const currencies: CurrencyConfig = {
         sendTx: solanaSendTx,
         createTx: solanaCreateTx,
         getPublicKey: solanaGetPublicKey,
+    } : undefined,
+    "everpay": keys.everpay ? {
+        base: ["AR", 1e12], // 1e12
+        account: { key: keys.everpay.key, address: keys.everpay.address },
+        provider: "api.everpay.io",
+        getTx: everpayGetTx,
+        getId: async (item) => {
+            return base64url.encode(Buffer.from(await Arweave.crypto.hash(await item.rawSignature())));
+        },
+        ownerToAddress: everpayOwnerToAddress,
+        price: () => getRedstonePrice("SOL"),
+        sign: everpaySign,
+        getSigner: everpayGetSigner,
+        verify: everpayVerify,
+        getCurrentHeight: everpayGetCurrentHeight,
+        getFee: everpayGetFee,
+        sendTx: everpaySendTx,
+        createTx: everpayCreateTx,
+        getPublicKey: everpayGetPublicKey,
     } : undefined,
 };
 
